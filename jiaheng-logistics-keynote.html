@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>嘉亨物流运输解决方案</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-warm: #FAFAF8;
+      --bg-gray: #F2F2F0;
+      --text-primary: #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --accent: #C4A35A;
+      --accent-dark: #9A7E3C;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      background: #000;
+    }
+
+    #deck {
+      width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: #111;
+    }
+
+    .slide-frame {
+      width: 1280px; height: 720px;
+      position: relative; overflow: hidden;
+      background: var(--bg-warm);
+      box-shadow: 0 40px 120px rgba(0,0,0,0.5);
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: none; opacity: 0;
+      transition: opacity 600ms cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--bg-warm);
+    }
+
+    .slide.active { display: flex; opacity: 1; z-index: 10; }
+    .slide.fade-out { opacity: 0; z-index: 5; }
+
+    .page-indicator {
+      position: absolute; top: 36px; right: 48px;
+      font-size: 14px; font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.1em; z-index: 50;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .display-title {
+      font-size: 72px; line-height: 1.08;
+      font-weight: 600; letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .section-title {
+      font-size: 56px; line-height: 1.12;
+      font-weight: 600; letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .big-number {
+      font-size: 120px; line-height: 1;
+      font-weight: 700; letter-spacing: -0.04em;
+      color: var(--text-primary);
+    }
+
+    .body-text {
+      font-size: 22px; line-height: 1.6;
+      color: var(--text-secondary); font-weight: 400;
+    }
+
+    .label {
+      font-size: 14px; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--accent-dark);
+    }
+
+    .image-cover {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .image-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(250,250,248,0.95) 0%, rgba(250,250,248,0.75) 45%, rgba(250,250,248,0.2) 100%);
+    }
+
+    .image-overlay-dark {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
+    }
+
+    .data-card {
+      background: white; border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+    }
+
+    .capability-card {
+      background: white; border-radius: 24px;
+      padding: 36px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+    }
+
+    .map-container {
+      position: relative;
+      width: 520px; height: 420px;
+    }
+
+    .city-dot {
+      position: absolute; width: 12px; height: 12px;
+      border-radius: 50%; background: var(--accent);
+      border: 3px solid white;
+      box-shadow: 0 2px 12px rgba(196,163,90,0.5);
+    }
+
+    .city-label {
+      position: absolute;
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary); white-space: nowrap;
+    }
+
+    .process-step {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+    }
+
+    .process-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%; background: var(--accent);
+    }
+
+    .process-line {
+      position: absolute; top: 7px; left: 0; right: 0;
+      height: 2px; background: #E5E5E0; z-index: -1;
+    }
+
+    .animate-in {
+      opacity: 0; transform: translateY(24px);
+      transition: all 700ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .active .animate-in { opacity: 1; transform: translateY(0); }
+
+    .delay-100 { transition-delay: 100ms; }
+    .delay-200 { transition-delay: 200ms; }
+    .delay-300 { transition-delay: 300ms; }
+    .delay-400 { transition-delay: 400ms; }
+    .delay-500 { transition-delay: 500ms; }
+    .delay-600 { transition-delay: 600ms; }
+
+    .nav-hint {
+      position: absolute; bottom: 28px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px; color: var(--text-secondary);
+      opacity: 0.6; letter-spacing: 0.05em; z-index: 50;
+    }
+
+    .route-arrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 18px; font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .route-line {
+      width: 40px; height: 2px;
+      background: var(--accent); position: relative;
+    }
+
+    .route-line::after {
+      content: ''; position: absolute; right: 0; top: -3px;
+      width: 0; height: 0;
+      border-left: 6px solid var(--accent);
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+  </style>
+</head>
+<body>
+  <div id="deck">
+    <div class="slide-frame">
+      <div class="page-indicator"><span id="current">1</span> / <span id="total">15</span></div>
+      
+      <!-- P1 Cover -->
+      <section class="slide active" data-index="1">
+        <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1600&q=80" alt="Truck transport" class="image-cover">
+        <div class="image-overlay-dark"></div>
+        <div class="relative z-10 h-full flex flex-col justify-end p-20 pb-28 text-white">
+          <div class="animate-in">
+            <p class="text-sm font-semibold tracking-[0.2em] uppercase opacity-70 mb-6">Jiaheng Logistics</p>
+            <h1 class="text-[88px] font-semibold leading-[1.05] tracking-tight mb-8">嘉亨物流</h1>
+            <p class="text-[32px] font-light opacity-90 max-w-2xl leading-snug">专业、高效、安全的<br>综合运输解决方案</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- P2 公司概览 -->
+      <section class="slide" data-index="2">
+        <div class="h-full flex items-center px-20">
+          <div class="w-[55%] pr-16">
+            <p class="label mb-5 animate-in">公司概览</p>
+            <h2 class="section-title mb-8 animate-in delay-100">从区域运输，到全国综合物流服务</h2>
+            <p class="body-text mb-12 max-w-xl animate-in delay-200">专注公路运输及综合物流服务，覆盖集装箱、普通货运、冷链运输等业务，服务客户供应链运输需求。</p>
+            <div class="grid grid-cols-3 gap-5 animate-in delay-300">
+              <div class="capability-card text-center">
+                <div class="text-3xl mb-3">🌐</div>
+                <p class="text-base font-semibold text-neutral-800">运输网络</p>
+              </div>
+              <div class="capability-card text-center">
+                <div class="text-3xl mb-3">🚛</div>
+                <p class="text-base font-semibold text-neutral-800">车辆资源</p>
+              </div>
+              <div class="capability-card text-center">
+                <div class="text-3xl mb-3">📍</div>
+                <p class="text-base font-semibold text-neutral-800">数字化管理</p>
+              </div>
+            </div>
+          </div>
+          <div class="w-[45%] h-full relative">
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80" alt="Logistics warehouse" class="image-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#FAFAF8] via-transparent to-transparent"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P3 业务能力总览 -->
+      <section class="slide" data-index="3">
+        <div class="h-full flex flex-col justify-center px-20">
+          <p class="label mb-5 animate-in">业务能力</p>
+          <h2 class="section-title mb-14 animate-in delay-100">一套覆盖多场景的运输体系</h2>
+          <div class="grid grid-cols-5 gap-5 animate-in delay-200">
+            <div class="capability-card text-center py-10">
+              <div class="text-4xl mb-4">📦</div>
+              <p class="text-lg font-semibold">集装箱运输</p>
+            </div>
+            <div class="capability-card text-center py-10">
+              <div class="text-4xl mb-4">🚚</div>
+              <p class="text-lg font-semibold">普货运输</p>
+            </div>
+            <div class="capability-card text-center py-10">
+              <div class="text-4xl mb-4">❄️</div>
+              <p class="text-lg font-semibold">冷链运输</p>
+            </div>
+            <div class="capability-card text-center py-10">
+              <div class="text-4xl mb-4">✈️</div>
+              <p class="text-lg font-semibold">机场运输</p>
+            </div>
+            <div class="capability-card text-center py-10">
+              <div class="text-4xl mb-4">🏭</div>
+              <p class="text-lg font-semibold">仓储配套</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P4 运力规模 -->
+      <section class="slide" data-index="4">
+        <div class="h-full flex items-center">
+          <div class="w-[50%] h-full relative">
+            <img src="https://images.unsplash.com/photo-1616432043562-3671ea2e5242?w=1200&q=80" alt="Fleet trucks" class="image-cover">
+            <div class="absolute inset-0 bg-gradient-to-l from-[#FAFAF8] via-transparent to-transparent"></div>
+          </div>
+          <div class="w-[50%] pl-16 pr-20">
+            <p class="label mb-5 animate-in">运力规模</p>
+            <h2 class="section-title mb-10 animate-in delay-100">稳定运力，是准时交付的基础</h2>
+            <div class="mb-10 animate-in delay-200">
+              <p class="text-base text-neutral-500 mb-2">自有车辆</p>
+              <p class="big-number">130<span class="text-[48px] font-semibold ml-2">+</span></p>
+            </div>
+            <div class="flex flex-wrap gap-3 mb-8 animate-in delay-300">
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">3T</span>
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">5T</span>
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">8T</span>
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">10T</span>
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">12T</span>
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">14T</span>
+              <span class="px-5 py-2 bg-white rounded-full text-sm font-medium shadow-sm">集装箱拖车</span>
+            </div>
+            <div class="flex gap-8 animate-in delay-400">
+              <div class="flex items-center gap-2 text-neutral-600">
+                <span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>
+                <span class="text-sm font-medium">车辆5年内</span>
+              </div>
+              <div class="flex items-center gap-2 text-neutral-600">
+                <span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>
+                <span class="text-sm font-medium">GPS覆盖</span>
+              </div>
+              <div class="flex items-center gap-2 text-neutral-600">
+                <span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>
+                <span class="text-sm font-medium">行车记录</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P5 全国覆盖能力 -->
+      <section class="slide" data-index="5">
+        <div class="h-full flex items-center px-20">
+          <div class="w-[45%] pr-12">
+            <p class="label mb-5 animate-in">全国覆盖</p>
+            <h2 class="section-title mb-10 animate-in delay-100">连接华南，覆盖全国主要运输节点</h2>
+            <div class="space-y-6 animate-in delay-200">
+              <div>
+                <p class="text-base font-semibold text-neutral-800 mb-2">华南核心</p>
+                <div class="flex gap-3">
+                  <span class="px-4 py-1.5 bg-white rounded-lg text-sm font-medium">深圳</span>
+                  <span class="px-4 py-1.5 bg-white rounded-lg text-sm font-medium">广州</span>
+                  <span class="px-4 py-1.5 bg-white rounded-lg text-sm font-medium">东莞</span>
+                </div>
+              </div>
+              <div>
+                <p class="text-base font-semibold text-neutral-800 mb-2">延伸区域</p>
+                <div class="flex gap-3">
+                  <span class="px-4 py-1.5 bg-neutral-200 rounded-lg text-sm font-medium">华东</span>
+                  <span class="px-4 py-1.5 bg-neutral-200 rounded-lg text-sm font-medium">华北</span>
+                  <span class="px-4 py-1.5 bg-neutral-200 rounded-lg text-sm font-medium">西南</span>
+                </div>
+              </div>
+              <div class="flex gap-6 pt-2">
+                <span class="text-sm font-semibold text-[#C4A35A]">FTL</span>
+                <span class="text-sm font-semibold text-[#C4A35A]">LTL</span>
+                <span class="text-sm font-semibold text-[#C4A35A]">集装箱运输</span>
+              </div>
+            </div>
+          </div>
+          <div class="w-[55%] flex justify-center animate-in delay-300">
+            <div class="map-container">
+              <svg viewBox="0 0 520 420" class="w-full h-full">
+                <path d="M120,280 Q160,260 200,270 T280,250 T360,220 T420,180 T460,140" fill="none" stroke="#E5E5E0" stroke-width="2" stroke-dasharray="6,4"/>
+                <path d="M180,320 Q220,300 260,290 T340,270 T400,240" fill="none" stroke="#E5E5E0" stroke-width="2" stroke-dasharray="6,4"/>
+                <path d="M140,160 Q180,180 220,170 T300,180 T380,160" fill="none" stroke="#E5E5E0" stroke-width="2" stroke-dasharray="6,4"/>
+              </svg>
+              <div class="city-dot" style="left: 68%; top: 71%;"></div>
+              <div class="city-label" style="left: 70%; top: 70%;">深圳</div>
+              <div class="city-dot" style="left: 64%; top: 67%;"></div>
+              <div class="city-label" style="left: 66%; top: 66%;">广州</div>
+              <div class="city-dot" style="left: 61%; top: 65%;"></div>
+              <div class="city-label" style="left: 55%; top: 64%;">东莞</div>
+              <div class="city-dot" style="left: 78%; top: 40%;"></div>
+              <div class="city-label" style="left: 80%; top: 39%;">上海</div>
+              <div class="city-dot" style="left: 74%; top: 55%;"></div>
+              <div class="city-label" style="left: 76%; top: 54%;">华东</div>
+              <div class="city-dot" style="left: 70%; top: 35%;"></div>
+              <div class="city-label" style="left: 72%; top: 34%;">华北</div>
+              <div class="city-dot" style="left: 42%; top: 55%;"></div>
+              <div class="city-label" style="left: 34%; top: 54%;">西南</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P6 国际货代合作能力 -->
+      <section class="slide" data-index="6">
+        <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1600&q=80" alt="Airport cargo" class="image-cover">
+        <div class="image-overlay"></div>
+        <div class="relative z-10 h-full flex flex-col justify-center px-20 max-w-3xl">
+          <p class="label mb-5 animate-in">国际货代</p>
+          <h2 class="section-title mb-10 animate-in delay-100">满足国际供应链客户的高标准要求</h2>
+          <div class="grid grid-cols-2 gap-5 animate-in delay-200">
+            <div class="capability-card">
+              <p class="text-lg font-semibold mb-1">国际货代合作经验</p>
+              <p class="text-sm text-neutral-500">长期服务国际供应链客户</p>
+            </div>
+            <div class="capability-card">
+              <p class="text-lg font-semibold mb-1">机场货物运输</p>
+              <p class="text-sm text-neutral-500">广深机场快速集散</p>
+            </div>
+            <div class="capability-card">
+              <p class="text-lg font-semibold mb-1">高价值货物操作</p>
+              <p class="text-sm text-neutral-500">安全规范，全程可控</p>
+            </div>
+            <div class="capability-card">
+              <p class="text-lg font-semibold mb-1">标准化流程管理</p>
+              <p class="text-sm text-neutral-500">ISO 体系，稳定交付</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P7 广深机场运输方案 -->
+      <section class="slide" data-index="7">
+        <div class="h-full flex flex-col justify-center px-20">
+          <p class="label mb-5 animate-in">机场运输</p>
+          <h2 class="section-title mb-12 animate-in delay-100">连接广东主要航空枢纽</h2>
+          <div class="flex gap-10 animate-in delay-200">
+            <div class="flex-1 data-card flex flex-col justify-between min-h-[280px]">
+              <div>
+                <p class="text-5xl font-semibold mb-3">SZX</p>
+                <p class="text-xl font-medium text-neutral-700">深圳宝安机场</p>
+              </div>
+              <div class="flex gap-3">
+                <span class="px-4 py-1.5 bg-neutral-100 rounded-lg text-sm font-medium">LTL</span>
+                <span class="px-4 py-1.5 bg-neutral-100 rounded-lg text-sm font-medium">FTL</span>
+              </div>
+            </div>
+            <div class="flex-1 data-card flex flex-col justify-between min-h-[280px]">
+              <div>
+                <p class="text-5xl font-semibold mb-3">CAN</p>
+                <p class="text-xl font-medium text-neutral-700">广州白云机场</p>
+              </div>
+              <div class="flex gap-3">
+                <span class="px-4 py-1.5 bg-neutral-100 rounded-lg text-sm font-medium">LTL</span>
+                <span class="px-4 py-1.5 bg-neutral-100 rounded-lg text-sm font-medium">FTL</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-center gap-16 mt-12 animate-in delay-300">
+            <div class="text-center">
+              <p class="text-3xl mb-2">⚡</p>
+              <p class="text-base font-medium">快速响应</p>
+            </div>
+            <div class="text-center">
+              <p class="text-3xl mb-2">🔄</p>
+              <p class="text-base font-medium">灵活调度</p>
+            </div>
+            <div class="text-center">
+              <p class="text-3xl mb-2">📍</p>
+              <p class="text-base font-medium">GPS追踪</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P8 国内机场运输方案 -->
+      <section class="slide" data-index="8">
+        <div class="h-full flex items-center px-20">
+          <div class="w-[45%] pr-12">
+            <p class="label mb-5 animate-in">国内机场网络</p>
+            <h2 class="section-title mb-10 animate-in delay-100">从广东连接全国主要航空节点</h2>
+            <p class="body-text animate-in delay-200">提供 FTL / LTL 方案，覆盖全国主要航空货运枢纽，确保货物高效转运。</p>
+          </div>
+          <div class="w-[55%] space-y-5 animate-in delay-300">
+            <div class="data-card flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl font-semibold w-20">深圳</span>
+                <span class="route-arrow"><span class="route-line"></span></span>
+                <span class="text-2xl font-semibold">上海浦东</span>
+              </div>
+              <span class="text-sm font-medium text-[#C4A35A]">FTL / LTL</span>
+            </div>
+            <div class="data-card flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl font-semibold w-20">深圳</span>
+                <span class="route-arrow"><span class="route-line"></span></span>
+                <span class="text-2xl font-semibold">北京</span>
+              </div>
+              <span class="text-sm font-medium text-[#C4A35A]">FTL / LTL</span>
+            </div>
+            <div class="data-card flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl font-semibold w-20">深圳</span>
+                <span class="route-arrow"><span class="route-line"></span></span>
+                <span class="text-2xl font-semibold">郑州</span>
+              </div>
+              <span class="text-sm font-medium text-[#C4A35A]">FTL / LTL</span>
+            </div>
+            <div class="data-card flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <span class="text-2xl font-semibold w-20">深圳</span>
+                <span class="route-arrow"><span class="route-line"></span></span>
+                <span class="text-2xl font-semibold">重庆</span>
+              </div>
+              <span class="text-sm font-medium text-[#C4A35A]">FTL / LTL</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P9 数字化运输管理 -->
+      <section class="slide" data-index="9">
+        <div class="h-full flex flex-col justify-center px-20">
+          <p class="label mb-5 animate-in">数字化</p>
+          <h2 class="section-title mb-14 animate-in delay-100">让每一次运输过程可见</h2>
+          <div class="relative animate-in delay-200">
+            <div class="process-line"></div>
+            <div class="relative grid grid-cols-6 gap-4">
+              <div class="process-step">
+                <div class="process-dot"></div>
+                <p class="text-base font-semibold mt-2">接单</p>
+              </div>
+              <div class="process-step">
+                <div class="process-dot"></div>
+                <p class="text-base font-semibold mt-2">调度</p>
+              </div>
+              <div class="process-step">
+                <div class="process-dot"></div>
+                <p class="text-base font-semibold mt-2">派车</p>
+              </div>
+              <div class="process-step">
+                <div class="process-dot"></div>
+                <p class="text-base font-semibold mt-2">GPS追踪</p>
+              </div>
+              <div class="process-step">
+                <div class="process-dot"></div>
+                <p class="text-base font-semibold mt-2">状态反馈</p>
+              </div>
+              <div class="process-step">
+                <div class="process-dot"></div>
+                <p class="text-base font-semibold mt-2">结算</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-16 grid grid-cols-3 gap-6 animate-in delay-300">
+            <div class="data-card text-center py-8">
+              <p class="text-4xl font-bold text-[#C4A35A] mb-2">100%</p>
+              <p class="text-base text-neutral-600">订单线上化</p>
+            </div>
+            <div class="data-card text-center py-8">
+              <p class="text-4xl font-bold text-[#C4A35A] mb-2">实时</p>
+              <p class="text-base text-neutral-600">车辆定位</p>
+            </div>
+            <div class="data-card text-center py-8">
+              <p class="text-4xl font-bold text-[#C4A35A] mb-2">透明</p>
+              <p class="text-base text-neutral-600">全程可视化</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P10 安全与质量体系 -->
+      <section class="slide" data-index="10">
+        <div class="h-full flex items-center px-20">
+          <div class="w-[50%] pr-16">
+            <p class="label mb-5 animate-in">安全与质量</p>
+            <h2 class="section-title mb-12 animate-in delay-100">安全，是物流服务的底线</h2>
+            <div class="grid grid-cols-2 gap-5 animate-in delay-200">
+              <div class="data-card text-center py-10">
+                <p class="text-4xl font-bold text-[#C4A35A] mb-3">ISO9001</p>
+                <p class="text-base text-neutral-600">质量管理体系</p>
+              </div>
+              <div class="data-card text-center py-10">
+                <p class="text-4xl font-bold text-[#C4A35A] mb-3">TAPA</p>
+                <p class="text-base text-neutral-600">高价值货物安全</p>
+              </div>
+            </div>
+          </div>
+          <div class="w-[50%] space-y-5 animate-in delay-300">
+            <div class="capability-card flex items-center gap-5">
+              <span class="w-10 h-10 rounded-full bg-[#C4A35A]/10 flex items-center justify-center text-[#C4A35A] text-lg">✓</span>
+              <p class="text-lg font-medium">车辆检查</p>
+            </div>
+            <div class="capability-card flex items-center gap-5">
+              <span class="w-10 h-10 rounded-full bg-[#C4A35A]/10 flex items-center justify-center text-[#C4A35A] text-lg">✓</span>
+              <p class="text-lg font-medium">驾驶员培训</p>
+            </div>
+            <div class="capability-card flex items-center gap-5">
+              <span class="w-10 h-10 rounded-full bg-[#C4A35A]/10 flex items-center justify-center text-[#C4A35A] text-lg">✓</span>
+              <p class="text-lg font-medium">风险管理</p>
+            </div>
+            <div class="capability-card flex items-center gap-5">
+              <span class="w-10 h-10 rounded-full bg-[#C4A35A]/10 flex items-center justify-center text-[#C4A35A] text-lg">✓</span>
+              <p class="text-lg font-medium">应急处理</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P11 冷链运输能力 -->
+      <section class="slide" data-index="11">
+        <div class="h-full flex items-center">
+          <div class="w-[50%] h-full relative">
+            <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=1200&q=80" alt="Cold chain" class="image-cover">
+            <div class="absolute inset-0 bg-gradient-to-l from-[#FAFAF8] via-transparent to-transparent"></div>
+          </div>
+          <div class="w-[50%] pl-16 pr-20">
+            <p class="label mb-5 animate-in">冷链运输</p>
+            <h2 class="section-title mb-10 animate-in delay-100">精准控制每一次温度变化</h2>
+            <div class="grid grid-cols-2 gap-5 animate-in delay-200">
+              <div class="capability-card text-center py-8">
+                <div class="text-3xl mb-3">🌡️</div>
+                <p class="text-base font-semibold">温控车辆</p>
+              </div>
+              <div class="capability-card text-center py-8">
+                <div class="text-3xl mb-3">💊</div>
+                <p class="text-base font-semibold">GXP相关运输</p>
+              </div>
+              <div class="capability-card text-center py-8">
+                <div class="text-3xl mb-3">📊</div>
+                <p class="text-base font-semibold">温度监控</p>
+              </div>
+              <div class="capability-card text-center py-8">
+                <div class="text-3xl mb-3">🛡️</div>
+                <p class="text-base font-semibold">应急预案</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P12 增值服务 -->
+      <section class="slide" data-index="12">
+        <div class="h-full flex flex-col justify-center px-20">
+          <p class="label mb-5 animate-in">增值服务</p>
+          <h2 class="section-title mb-14 animate-in delay-100">不止运输，更关注货物交付</h2>
+          <div class="grid grid-cols-4 gap-6 animate-in delay-200">
+            <div class="capability-card text-center py-12">
+              <div class="text-4xl mb-4">⬆️</div>
+              <p class="text-lg font-semibold">装卸支持</p>
+            </div>
+            <div class="capability-card text-center py-12">
+              <div class="text-4xl mb-4">🔗</div>
+              <p class="text-lg font-semibold">货物固定</p>
+            </div>
+            <div class="capability-card text-center py-12">
+              <div class="text-4xl mb-4">🏭</div>
+              <p class="text-lg font-semibold">工厂现场操作</p>
+            </div>
+            <div class="capability-card text-center py-12">
+              <div class="text-4xl mb-4">📦</div>
+              <p class="text-lg font-semibold">特殊货物处理</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P13 成本优化方案 -->
+      <section class="slide" data-index="13">
+        <div class="h-full flex items-center px-20">
+          <div class="w-[40%] pr-12">
+            <p class="label mb-5 animate-in">成本优化</p>
+            <h2 class="section-title animate-in delay-100">通过数字化和网络优化降低运输成本</h2>
+          </div>
+          <div class="w-[60%] grid grid-cols-2 gap-6 animate-in delay-200">
+            <div class="data-card py-10">
+              <p class="text-4xl font-semibold text-[#C4A35A] mb-3">01</p>
+              <p class="text-xl font-semibold mb-2">路线优化</p>
+              <p class="text-base text-neutral-500">智能规划最优路径</p>
+            </div>
+            <div class="data-card py-10">
+              <p class="text-4xl font-semibold text-[#C4A35A] mb-3">02</p>
+              <p class="text-xl font-semibold mb-2">智能调度</p>
+              <p class="text-base text-neutral-500">提升车辆利用率</p>
+            </div>
+            <div class="data-card py-10">
+              <p class="text-4xl font-semibold text-[#C4A35A] mb-3">03</p>
+              <p class="text-xl font-semibold mb-2">运输集拼</p>
+              <p class="text-base text-neutral-500">整合订单，降低空驶</p>
+            </div>
+            <div class="data-card py-10">
+              <p class="text-4xl font-semibold text-[#C4A35A] mb-3">04</p>
+              <p class="text-xl font-semibold mb-2">新能源应用</p>
+              <p class="text-base text-neutral-500">绿色降本并行</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P14 ESG与未来发展 -->
+      <section class="slide" data-index="14">
+        <div class="h-full flex flex-col justify-center px-20">
+          <p class="label mb-5 animate-in">ESG 与未来发展</p>
+          <h2 class="section-title mb-14 animate-in delay-100">打造更加绿色、安全、可持续的物流体系</h2>
+          <div class="grid grid-cols-3 gap-8 animate-in delay-200">
+            <div class="data-card">
+              <p class="text-sm font-semibold tracking-widest text-[#C4A35A] mb-4">ENVIRONMENT</p>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3 text-lg font-medium"><span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>新能源车辆</li>
+                <li class="flex items-center gap-3 text-lg font-medium"><span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>节能减排</li>
+              </ul>
+            </div>
+            <div class="data-card">
+              <p class="text-sm font-semibold tracking-widest text-[#C4A35A] mb-4">SOCIAL</p>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3 text-lg font-medium"><span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>安全培训</li>
+                <li class="flex items-center gap-3 text-lg font-medium"><span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>员工管理</li>
+              </ul>
+            </div>
+            <div class="data-card">
+              <p class="text-sm font-semibold tracking-widest text-[#C4A35A] mb-4">GOVERNANCE</p>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3 text-lg font-medium"><span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>ISO体系</li>
+                <li class="flex items-center gap-3 text-lg font-medium"><span class="w-2 h-2 rounded-full bg-[#C4A35A]"></span>标准流程</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- P15 Closing -->
+      <section class="slide" data-index="15">
+        <div class="h-full flex flex-col justify-center items-center text-center px-20">
+          <p class="text-sm font-semibold tracking-[0.2em] uppercase text-[#C4A35A] mb-8 animate-in">Jiaheng Logistics</p>
+          <h1 class="display-title mb-8 animate-in delay-100">嘉亨物流</h1>
+          <p class="text-[36px] font-light text-neutral-600 mb-16 animate-in delay-200">可靠的运输伙伴</p>
+          <div class="flex gap-12 animate-in delay-300">
+            <div class="text-center">
+              <p class="text-sm text-neutral-400 mb-2">联系我们</p>
+              <p class="text-lg font-medium">contact@jiaheng-logistics.com</p>
+            </div>
+            <div class="text-center">
+              <p class="text-sm text-neutral-400 mb-2">服务热线</p>
+              <p class="text-lg font-medium">400-XXX-XXXX</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="nav-hint">← → 切换幻灯片 · 空格键下一页</div>
+    </div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const currentEl = document.getElementById('current');
+    const totalEl = document.getElementById('total');
+    let current = 1;
+    const total = slides.length;
+
+    totalEl.textContent = total;
+
+    function updateSlides() {
+      slides.forEach(slide => {
+        const idx = parseInt(slide.dataset.index);
+        slide.classList.remove('active', 'fade-out');
+        if (idx === current) {
+          slide.classList.add('active');
+        } else if (idx === current - 1 || (current === 1 && idx === total)) {
+          slide.classList.add('fade-out');
+        }
+      });
+      currentEl.textContent = current;
+      location.hash = '#' + current;
+    }
+
+    function next() {
+      current = current >= total ? 1 : current + 1;
+      updateSlides();
+    }
+
+    function prev() {
+      current = current <= 1 ? total : current - 1;
+      updateSlides();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        next();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prev();
+      }
+    });
+
+    if (location.hash) {
+      const hashNum = parseInt(location.hash.replace('#', ''));
+      if (hashNum >= 1 && hashNum <= total) current = hashNum;
+    }
+
+    updateSlides();
+  </script>
+</body>
+</html>

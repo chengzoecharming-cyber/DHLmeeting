@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Python virtual environment
+.export_pdf_venv/
+
+# OpenDesign application bundle (huge, not needed for the webpage)
+open-design/
+open-design-0.13.0-mac-arm64.dmg
+
+# Office and PDF documents not referenced by the webpage
+深圳会议内容（华南本地运输讨论及介绍）8.3 .pptx
+资料/
+嘉亨物流运输解决方案-投标版.pdf
+
+# Backup files
+*.bak
+
+# Export helper scripts (not part of the site)
+export_pdf.py
+EXPORT_GUIDE.md
