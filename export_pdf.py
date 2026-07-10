@@ -26,6 +26,7 @@ PORT = 8765
 CHROME_PATH = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 SLIDE_WIDTH = 1280
 SLIDE_HEIGHT = 720
+SCALE_FACTOR = 2  # 2x 高清截图
 # ==================================
 
 
@@ -69,6 +70,7 @@ def capture_slide(url: str, output_png: str):
         "--disable-gpu",
         "--hide-scrollbars",
         "--run-all-compositor-stages-before-draw",
+        f"--force-device-scale-factor={SCALE_FACTOR}",
         f"--window-size={SLIDE_WIDTH},{SLIDE_HEIGHT}",
         f"--screenshot={output_png}",
         url,
@@ -107,7 +109,7 @@ def combine_images_to_pdf(png_paths: list[str], output_path: str):
     images[0].save(
         output_path,
         "PDF",
-        resolution=96,
+        resolution=96 * SCALE_FACTOR,
         save_all=True,
         append_images=images[1:],
     )
