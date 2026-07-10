@@ -361,16 +361,21 @@
     .d4 { transition-delay: 0; }
 
     @media print {
+      @page { size: 1280px 720px; margin: 0; }
       body { background: white; overflow: visible; }
-      #deck { width: 100%; height: auto; display: block; }
+      #deck { width: auto; height: auto; display: block; }
       .slide-frame {
-        width: 100%; height: auto;
+        width: auto; height: auto;
         box-shadow: none; margin: 0;
+        background: white;
       }
       .slide {
-        width: 100vw; height: 100vh;
+        position: relative;
+        width: 1280px; height: 720px;
         page-break-after: always; break-after: page;
         border-bottom: none;
+        background: var(--bg);
+        overflow: hidden;
       }
       .page-indicator, .export-btn { display: none !important; }
     }
@@ -1304,15 +1309,30 @@
     window.addEventListener('scroll', updateCurrentFromScroll, { passive: true });
     window.addEventListener('resize', updateCurrentFromScroll);
 
+    const params = new URLSearchParams(location.search);
+    const isExport = params.has('export');
+
     if (location.hash) {
       const hashNum = parseInt(location.hash.replace('#', ''));
       if (hashNum >= 1 && hashNum <= total) {
-        const target = slides[hashNum - 1];
-        if (target) target.scrollIntoView({ behavior: 'instant', block: 'start' });
+        if (isExport) {
+          // Export mode: show only the requested slide for clean screenshot
+          slides.forEach((slide, index) => {
+            slide.style.display = (index === hashNum - 1) ? 'block' : 'none';
+            slide.style.borderBottom = 'none';
+          });
+          document.body.style.overflow = 'hidden';
+          document.documentElement.style.scrollBehavior = 'auto';
+          window.scrollTo(0, 0);
+          currentEl.textContent = hashNum;
+        } else {
+          const target = slides[hashNum - 1];
+          if (target) target.scrollIntoView({ behavior: 'instant', block: 'start' });
+        }
       }
     }
 
-    updateCurrentFromScroll();
+    if (!isExport) updateCurrentFromScroll();
   </script>
 </body>
 </html>

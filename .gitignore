@@ -18,6 +18,12 @@ open-design-0.13.0-mac-arm64.dmg
 # Backup files
 *.bak
 
+# Exported PDF
+嘉亨物流运输解决方案-投标版.pdf
+
 # Export helper scripts (not part of the site)
-export_pdf.py
 EXPORT_GUIDE.md
+
+# Browser "Save As" artifacts
+嘉亨物流运输解决方案 - 投标版 V4.html
+嘉亨物流运输解决方案 - 投标版 V4_files/
