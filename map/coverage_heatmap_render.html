@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>coverage_heatmap</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" />
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #f2f3f4;
+  }
+  #map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .leaflet-control-attribution {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    background: rgba(255,255,255,0.6) !important;
+  }
+  .city-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #2a2a2a;
+    text-shadow:
+      1px 1px 0 #fff,
+      -1px -1px 0 #fff,
+      1px -1px 0 #fff,
+      -1px 1px 0 #fff,
+      0 0 4px #fff;
+    white-space: nowrap;
+    transform: translateX(-50%) translateY(-150%);
+  }
+  .city-dot {
+    width: 10px;
+    height: 10px;
+    background: #ff3b30;
+    border: 2px solid #333;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+<script>
+  const map = L.map('map', {
+  zoomSnap: 0.25,
+  zoomControl: false,
+  attributionControl: false,
+  preferCanvas: true
+});
+
+// 聚焦广东、湖南、湖北、海南四省
+map.fitBounds(
+  [[18.0, 108.0], [33.5, 117.5]],
+  { padding: [20, 20], animate: false }
+);
+
+  L.tileLayer(
+    'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+    {
+      subdomains: ['1', '2', '3', '4'],
+      maxZoom: 18,
+      minZoom: 1,
+      attribution: '高德地图'
+    }
+  ).addTo(map);
+
+  const heatData = [[23.1291, 113.2644, 1.0], [22.5431, 114.0579, 0.98], [22.5112, 113.3927, 0.9], [23.0207, 113.7518, 0.9], [22.271, 113.567, 0.85], [22.87, 113.68, 0.8], [23.5515, 116.3716, 0.8], [23.158, 113.33, 0.8], [22.783, 113.09, 0.75], [22.29, 110.29, 0.75], [21.27, 110.35, 0.75], [24.812, 113.59, 0.7], [23.35, 116.7, 0.7], [22.42, 114.05, 0.7], [23.03, 113.7, 0.68], [22.19, 113.54, 0.65], [22.6, 114.9, 0.65], [21.95, 112.7, 0.65], [22.35, 111.95, 0.6], [23.8, 112.45, 0.6], [23.35, 116.2, 0.6], [22.78, 115.38, 0.6], [23.02, 112.45, 0.55], [24.3, 116.12, 0.55], [28.228, 112.9388, 0.85], [27.8278, 112.973, 0.7], [26.889, 112.572, 0.7], [27.8468, 113.128, 0.7], [29.0316, 111.6983, 0.65], [29.152, 110.478, 0.65], [28.588, 112.36, 0.6], [27.233, 111.467, 0.6], [25.808, 113.236, 0.6], [26.42, 111.6, 0.55], [27.73, 109.18, 0.55], [27.575, 110.02, 0.55], [27.7, 111.43, 0.5], [28.6, 109.96, 0.5], [30.5928, 114.3055, 0.85], [30.3, 112.28, 0.7], [30.68, 111.28, 0.7], [30.33, 114.32, 0.7], [30.2, 115.08, 0.65], [31.71, 112.25, 0.65], [32.39, 111.67, 0.65], [30.93, 113.4, 0.6], [32.13, 114.08, 0.6], [30.42, 114.93, 0.6], [30.45, 112.2, 0.55], [31.35, 113.75, 0.55], [29.65, 111.68, 0.55], [31.73, 114.38, 0.5], [29.85, 114.32, 0.5], [30.68, 110.97, 0.5], [20.044, 110.1999, 0.8], [18.252, 109.512, 0.75], [19.24, 110.47, 0.65], [19.52, 109.58, 0.6], [18.8, 110.4, 0.6], [19.7, 110.33, 0.55], [18.6, 108.9, 0.55], [18.98, 109.42, 0.5], [22.5, 111.5, 0.15], [24.5, 113.5, 0.15], [26.5, 112.5, 0.15], [29.5, 113.5, 0.15], [28.5, 110.5, 0.15], [30.0, 110.5, 0.15], [20.5, 111.0, 0.15], [19.5, 109.5, 0.15], [21.8, 110.5, 0.12], [23.8, 115.0, 0.12], [27.0, 113.5, 0.12], [29.8, 112.5, 0.12], [20.0, 110.5, 0.12]];
+  L.heatLayer(heatData, {
+    minOpacity: 0.35,
+    maxZoom: 6,
+    radius: 36,
+    blur: 28,
+    gradient: {
+      0.0: 'rgba(0,0,180,0.25)',
+      0.2: 'rgba(0,120,220,0.55)',
+      0.4: 'rgba(0,220,220,0.75)',
+      0.6: 'rgba(60,220,60,0.85)',
+      0.8: 'rgba(255,220,0,0.95)',
+      1.0: 'rgba(255,40,0,1.0)'
+    }
+  }).addTo(map);
+
+  const capitals = [["\u5e7f\u5dde", 23.1291, 113.2644], ["\u957f\u6c99", 28.228, 112.9388], ["\u6b66\u6c49", 30.5928, 114.3055], ["\u6d77\u53e3", 20.044, 110.1999]];
+  capitals.forEach(([name, lat, lng]) => {
+    const icon = L.divIcon({
+      className: '',
+      html: '<div class="city-dot"></div><div class="city-label">' + name + '</div>',
+      iconSize: [0, 0]
+    });
+    L.marker([lat, lng], { icon: icon }).addTo(map);
+  });
+</script>
+</body>
+</html>

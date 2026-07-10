@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECharts 浅色热力地图</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; }
+    body { background: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    const chart = echarts.init(document.getElementById('map'));
+
+    // 原始城市数据
+    const cityData = [
+      // 广东 — 珠三角
+      { lng: 114.0579, lat: 22.5431, weight: 1.00 },
+      { lng: 113.2644, lat: 23.1291, weight: 0.95 },
+      { lng: 113.7518, lat: 23.0207, weight: 0.92 },
+      { lng: 113.1214, lat: 23.0215, weight: 0.88 },
+      { lng: 113.5767, lat: 22.2707, weight: 0.85 },
+      { lng: 114.4158, lat: 23.1107, weight: 0.82 },
+      { lng: 113.3927, lat: 22.5176, weight: 0.78 },
+      { lng: 113.0815, lat: 22.5787, weight: 0.72 },
+      { lng: 112.4653, lat: 23.0469, weight: 0.68 },
+
+      // 广东 — 粤东
+      { lng: 116.7286, lat: 23.3839, weight: 0.55 },
+      { lng: 116.6329, lat: 23.6567, weight: 0.45 },
+      { lng: 116.3728, lat: 23.5497, weight: 0.48 },
+      { lng: 115.3752, lat: 22.7857, weight: 0.42 },
+      { lng: 116.1225, lat: 24.2886, weight: 0.38 },
+
+      // 广东 — 粤西
+      { lng: 110.3594, lat: 21.2707, weight: 0.52 },
+      { lng: 110.9192, lat: 21.6598, weight: 0.46 },
+      { lng: 111.9826, lat: 21.8579, weight: 0.40 },
+      { lng: 112.0444, lat: 22.9154, weight: 0.35 },
+
+      // 广东 — 粤北
+      { lng: 113.5975, lat: 24.8108, weight: 0.38 },
+      { lng: 113.0560, lat: 24.4880, weight: 0.36 },
+      { lng: 114.6978, lat: 23.7435, weight: 0.34 },
+
+      // 湖南
+      { lng: 112.9388, lat: 28.2282, weight: 0.50 },
+      { lng: 113.1289, lat: 29.3571, weight: 0.35 },
+      { lng: 112.5720, lat: 26.8932, weight: 0.32 },
+      { lng: 113.0147, lat: 25.7705, weight: 0.30 },
+
+      // 湖北
+      { lng: 114.3054, lat: 30.5931, weight: 0.40 },
+      { lng: 111.2868, lat: 30.6919, weight: 0.25 },
+      { lng: 112.1221, lat: 32.0090, weight: 0.22 },
+
+      // 海南
+      { lng: 110.3492, lat: 20.0174, weight: 0.45 },
+      { lng: 109.5082, lat: 18.2479, weight: 0.38 },
+      { lng: 109.5808, lat: 19.5211, weight: 0.28 }
+    ];
+
+    // 在相邻城市之间插值，让热力更连续
+    function interpolatePoints(points, steps = 3) {
+      const result = [];
+      for (let i = 0; i < points.length; i++) {
+        result.push(points[i]);
+        for (let j = i + 1; j < points.length; j++) {
+          const p1 = points[i];
+          const p2 = points[j];
+          const dist = Math.sqrt(
+            Math.pow(p1.lng - p2.lng, 2) + Math.pow(p1.lat - p2.lat, 2)
+          );
+          // 只在距离较近的城市之间插值（同一区域内）
+          if (dist < 4) {
+            for (let k = 1; k <= steps; k++) {
+              const t = k / (steps + 1);
+              result.push({
+                lng: p1.lng + (p2.lng - p1.lng) * t,
+                lat: p1.lat + (p2.lat - p1.lat) * t,
+                weight: p1.weight + (p2.weight - p1.weight) * t * 0.7
+              });
+            }
+          }
+        }
+      }
+      return result;
+    }
+
+    const heatmapData = interpolatePoints(cityData, 2).map(p => [p.lng, p.lat, p.weight]);
+
+    const option = {
+      backgroundColor: '#f8fafc',
+      title: {
+        text: '广东及辐射区域热力分布',
+        subtext: '中心红色 → 边缘紫色',
+        left: 'center',
+        top: 20,
+        textStyle: { color: '#1f2937', fontSize: 22, fontWeight: 'bold' },
+        subtextStyle: { color: '#6b7280', fontSize: 14 }
+      },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderColor: '#e5e7eb',
+        textStyle: { color: '#374151' },
+        formatter: (params) => {
+          return `<div style="font-weight:bold;">热度指数</div><div>${params.data[2].toFixed(2)}</div>`;
+        }
+      },
+      geo: {
+        map: 'china',
+        roam: true,
+        zoom: 1.2,
+        center: [113.5, 26],
+        label: { show: false },
+        itemStyle: {
+          areaColor: '#eef2f7',
+          borderColor: '#cbd5e1',
+          borderWidth: 1
+        },
+        emphasis: {
+          itemStyle: { areaColor: '#e2e8f0' }
+        }
+      },
+      visualMap: {
+        min: 0,
+        max: 1,
+        calculable: true,
+        orient: 'vertical',
+        right: 30,
+        bottom: 60,
+        textStyle: { color: '#374151' },
+        inRange: {
+          // 边缘淡紫色 → 中心红色
+          color: ['rgba(139,92,246,0.3)', '#8b5cf6', '#a855f7', '#ec4899', '#f97316', '#ef4444', '#dc2626']
+        }
+      },
+      series: [
+        {
+          name: '热力分布',
+          type: 'heatmap',
+          coordinateSystem: 'geo',
+          pointSize: 28,
+          blurSize: 22,
+          data: heatmapData
+        }
+      ]
+    };
+
+    fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+      .then(res => res.json())
+      .then(geoJson => {
+        echarts.registerMap('china', geoJson);
+        chart.setOption(option);
+      })
+      .catch(err => {
+        console.error('地图数据加载失败', err);
+        document.getElementById('map').innerHTML = '<p style="color:#374151;text-align:center;padding-top:50px;">地图数据加载失败，请检查网络连接。</p>';
+      });
+
+    window.addEventListener('resize', () => chart.resize());
+  </script>
+</body>
+</html>

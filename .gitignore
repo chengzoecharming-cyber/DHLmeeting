@@ -3,6 +3,8 @@
 
 # Python virtual environment
 .export_pdf_venv/
+map/.venv/
+map/venv/
 
 # OpenDesign application bundle (huge, not needed for the webpage)
 open-design/

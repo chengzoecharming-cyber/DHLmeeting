@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高德热力图 - 广东及辐射区域</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; }
+    body { background: #050b14; }
+    .tips {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      color: #fff;
+      background: rgba(0,0,0,0.7);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="tips">颜色越红表示热度越高，珠三角热度最高</div>
+  <div id="map"></div>
+
+  <!-- 
+    注意：把下面的 "你的高德Key" 替换成你申请的高德地图 Key
+    申请地址：https://console.amap.com/dev/key/app
+  -->
+  <script src="https://webapi.amap.com/maps?v=2.0&key=你的高德Key&plugin=AMap.HeatMap"></script>
+  <script>
+    // 城市热度数据：[经度, 纬度, 权重 0-1]
+    // 珠三角 / 广东城市权重高，外省相对低
+    const heatmapData = [
+      // 广东 — 珠三角（权重 0.9-1.0）
+      { lng: 114.0579, lat: 22.5431, count: 1.0 },   // 深圳
+      { lng: 113.2644, lat: 23.1291, count: 0.95 },  // 广州
+      { lng: 113.7518, lat: 23.0207, count: 0.92 },  // 东莞
+      { lng: 113.1214, lat: 23.0215, count: 0.88 },  // 佛山
+      { lng: 113.5767, lat: 22.2707, count: 0.85 },  // 珠海
+      { lng: 114.4158, lat: 23.1107, count: 0.82 },  // 惠州
+      { lng: 113.3927, lat: 22.5176, count: 0.78 },  // 中山
+      { lng: 113.0815, lat: 22.5787, count: 0.72 },  // 江门
+      { lng: 112.4653, lat: 23.0469, count: 0.68 },  // 肇庆
+
+      // 广东 — 粤东
+      { lng: 116.7286, lat: 23.3839, count: 0.55 },  // 汕头
+      { lng: 116.6329, lat: 23.6567, count: 0.45 },  // 潮州
+      { lng: 116.3728, lat: 23.5497, count: 0.48 },  // 揭阳
+      { lng: 115.3752, lat: 22.7857, count: 0.42 },  // 汕尾
+      { lng: 116.1225, lat: 24.2886, count: 0.38 },  // 梅州
+
+      // 广东 — 粤西
+      { lng: 110.3594, lat: 21.2707, count: 0.52 },  // 湛江
+      { lng: 110.9192, lat: 21.6598, count: 0.46 },  // 茂名
+      { lng: 111.9826, lat: 21.8579, count: 0.40 },  // 阳江
+      { lng: 112.0444, lat: 22.9154, count: 0.35 },  // 云浮
+
+      // 广东 — 粤北
+      { lng: 113.5975, lat: 24.8108, count: 0.38 },  // 韶关
+      { lng: 113.0560, lat: 24.4880, count: 0.36 },  // 清远
+      { lng: 114.6978, lat: 23.7435, count: 0.34 },  // 河源
+
+      // 湖南（权重 0.3-0.5）
+      { lng: 112.9388, lat: 28.2282, count: 0.50 },  // 长沙
+      { lng: 113.1289, lat: 29.3571, count: 0.35 },  // 岳阳
+      { lng: 112.5720, lat: 26.8932, count: 0.32 },  // 衡阳
+      { lng: 113.0147, lat: 25.7705, count: 0.30 },  // 郴州
+
+      // 湖北（权重 0.2-0.4）
+      { lng: 114.3054, lat: 30.5931, count: 0.40 },  // 武汉
+      { lng: 111.2868, lat: 30.6919, count: 0.25 },  // 宜昌
+      { lng: 112.1221, lat: 32.0090, count: 0.22 },  // 襄阳
+
+      // 海南（权重 0.3-0.5）
+      { lng: 110.3492, lat: 20.0174, count: 0.45 },  // 海口
+      { lng: 109.5082, lat: 18.2479, count: 0.38 },  // 三亚
+      { lng: 109.5808, lat: 19.5211, count: 0.28 }   // 儋州
+    ];
+
+    window.onload = function() {
+      // 初始化地图
+      const map = new AMap.Map('map', {
+        zoom: 6,
+        center: [113.5, 24],
+        viewMode: '2D',
+        mapStyle: 'amap://styles/dark'  // 深色底图
+      });
+
+      // 创建热力图
+      const heatmap = new AMap.HeatMap(map, {
+        radius: 35,        // 热力点半径
+        opacity: [0, 0.8], // 透明度范围
+        gradient: {
+          0.3: 'blue',
+          0.5: 'cyan',
+          0.7: 'lime',
+          0.9: 'yellow',
+          1.0: 'red'
+        }
+      });
+
+      // 设置数据
+      heatmap.setDataSet({
+        data: heatmapData.map(item => ({
+          lng: item.lng,
+          lat: item.lat,
+          count: item.count
+        })),
+        max: 1.0
+      });
+    };
+  </script>
+</body>
+</html>

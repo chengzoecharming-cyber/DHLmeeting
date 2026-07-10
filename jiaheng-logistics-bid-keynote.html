@@ -25,32 +25,37 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
-      width: 100%; height: 100%; overflow: hidden;
+      width: 100%; min-height: 100%;
+      overflow-x: hidden; overflow-y: auto;
       font-family: 'Inter', 'Noto Sans SC', sans-serif;
       background: #0A0A0A; color: var(--text);
     }
 
     #deck {
-      width: 100vw; height: 100vh;
-      display: flex; align-items: center; justify-content: center;
+      width: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0;
     }
 
     .slide-frame {
-      width: 1280px; height: 720px;
-      position: relative; overflow: hidden;
+      width: 100%; max-width: 1280px;
+      display: flex; flex-direction: column;
       background: var(--bg);
-      box-shadow: 0 30px 100px rgba(0,0,0,0.6);
+      box-shadow: none;
     }
 
     .slide {
-      position: absolute; inset: 0;
-      display: none; opacity: 0;
-      transition: opacity 500ms ease;
+      position: relative;
+      display: block; opacity: 1;
+      width: 100%; aspect-ratio: 16 / 9;
+      overflow: hidden;
       background: var(--bg);
+      border-bottom: 1px solid var(--line);
     }
 
-    .slide.active { display: block; opacity: 1; z-index: 10; }
-    .slide.fade-out { opacity: 0; z-index: 5; }
+    .slide.active, .slide.fade-out {
+      display: block; opacity: 1; z-index: auto;
+    }
 
     .slide-inner {
       width: 100%; height: 100%;
@@ -345,25 +350,28 @@
     }
 
     .animate-in {
-      opacity: 0; transform: translateY(16px);
-      transition: all 550ms cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 1; transform: none;
+      transition: none;
     }
 
-    .active .animate-in { opacity: 1; transform: translateY(0); }
-    .d1 { transition-delay: 60ms; }
-    .d2 { transition-delay: 130ms; }
-    .d3 { transition-delay: 200ms; }
-    .d4 { transition-delay: 270ms; }
+    .active .animate-in { opacity: 1; transform: none; }
+    .d1 { transition-delay: 0; }
+    .d2 { transition-delay: 0; }
+    .d3 { transition-delay: 0; }
+    .d4 { transition-delay: 0; }
 
     @media print {
       body { background: white; overflow: visible; }
       #deck { width: 100%; height: auto; display: block; }
       .slide-frame {
-        width: 100vw; height: 100vh;
+        width: 100%; height: auto;
         box-shadow: none; margin: 0;
-        page-break-after: always; break-after: page;
       }
-      .slide { display: block !important; opacity: 1 !important; }
+      .slide {
+        width: 100vw; height: 100vh;
+        page-break-after: always; break-after: page;
+        border-bottom: none;
+      }
       .page-indicator, .export-btn { display: none !important; }
     }
   </style>
@@ -423,7 +431,7 @@
                 <p class="text-sm text-neutral-500">资质认证</p>
               </div>
               <div class="card text-center py-6">
-                <p class="text-4xl font-bold text-[#C4A35A] mb-2">[待补充]</p>
+                <p class="text-4xl font-bold text-[#C4A35A] mb-2">7–8</p>
                 <p class="text-sm text-neutral-500">服务客户</p>
               </div>
             </div>
@@ -500,7 +508,7 @@
           <div class="flex-1 flex flex-col justify-center gap-5">
             <div class="row animate-in d1" style="gap: 20px;">
               <div class="card" style="flex: 0 0 280px; display:flex; flex-direction:column; justify-content:center;">
-                <p class="text-base text-neutral-500 mb-3">自有车辆</p>
+                <p class="text-base text-neutral-500 mb-3">合作车辆资源</p>
                 <p class="big-number">130<span class="text-[32px] font-semibold ml-2">+</span></p>
                 <div class="mt-4 flex flex-wrap gap-2">
                   <span class="tag">普通运输</span>
@@ -546,8 +554,9 @@
             <div class="cols-4 animate-in d2">
               <div class="card text-center py-5">
                 <p class="text-sm text-neutral-500 mb-1">新能源车辆</p>
-                <p class="text-lg font-semibold">3 台已投入运营</p>
-                <p class="text-xs text-neutral-400 mt-1">目标 16 台</p>
+                <p class="text-lg font-semibold">12 台</p>
+                <p class="text-xs text-neutral-400 mt-1">散货 7 台 · 货柜 5 台</p>
+                <p class="text-xs text-neutral-400">目标 3 年内更新 50%+</p>
               </div>
               <div class="card text-center py-5">
                 <p class="text-sm text-neutral-500 mb-1">GPS定位</p>
@@ -597,41 +606,7 @@
               </div>
             </div>
             <div class="map-bg flex-1" style="min-height: 0;">
-              <svg viewBox="0 0 700 440" class="w-full h-full" preserveAspectRatio="xMidYMid meet">
-                <!-- Hub Shenzhen -->
-                <circle cx="520" cy="300" r="8" fill="#C4A35A"/>
-                <circle cx="520" cy="300" r="55" fill="none" stroke="#C4A35A" stroke-width="2" stroke-dasharray="4,4" opacity="0.4"/>
-                <!-- PRD network -->
-                <line x1="520" y1="300" x2="470" y2="270" stroke="#C4A35A" stroke-width="2" opacity="0.6"/>
-                <line x1="520" y1="300" x2="490" y2="320" stroke="#C4A35A" stroke-width="2" opacity="0.6"/>
-                <line x1="520" y1="300" x2="450" y2="300" stroke="#C4A35A" stroke-width="2" opacity="0.6"/>
-                <line x1="520" y1="300" x2="500" y2="340" stroke="#C4A35A" stroke-width="2" opacity="0.6"/>
-                <!-- Extension lines -->
-                <line x1="450" y1="300" x2="320" y2="240" stroke="#DCD8D0" stroke-width="2" stroke-dasharray="6,4"/>
-                <line x1="450" y1="300" x2="300" y2="300" stroke="#DCD8D0" stroke-width="2" stroke-dasharray="6,4"/>
-                <line x1="500" y1="340" x2="420" y2="400" stroke="#DCD8D0" stroke-width="2" stroke-dasharray="6,4"/>
-                <line x1="320" y1="240" x2="220" y2="280" stroke="#DCD8D0" stroke-width="2" stroke-dasharray="6,4"/>
-              </svg>
-              <div class="city-dot" style="left: 72%; top: 66%;"></div>
-              <div class="city-label" style="left: 74%; top: 62%;">深圳</div>
-              <div class="city-dot" style="left: 66%; top: 60%;"></div>
-              <div class="city-label" style="left: 68%; top: 56%;">广州</div>
-              <div class="city-dot" style="left: 62%; top: 66%;"></div>
-              <div class="city-label" style="left: 54%; top: 66%;">东莞</div>
-              <div class="city-dot" style="left: 58%; top: 72%;"></div>
-              <div class="city-label" style="left: 48%; top: 74%;">佛山</div>
-              <div class="city-dot" style="left: 68%; top: 74%;"></div>
-              <div class="city-label" style="left: 60%; top: 78%;">惠州</div>
-              <div class="city-dot" style="left: 42%; top: 52%;"></div>
-              <div class="city-label" style="left: 32%; top: 50%;">湖南</div>
-              <div class="city-dot" style="left: 40%; top: 66%;"></div>
-              <div class="city-label" style="left: 30%; top: 66%;">湖北</div>
-              <div class="city-dot" style="left: 58%; top: 88%;"></div>
-              <div class="city-label" style="left: 48%; top: 90%;">海南</div>
-              <div class="city-dot" style="left: 30%; top: 62%;"></div>
-              <div class="city-label" style="left: 20%; top: 62%;">广西</div>
-              <div class="city-dot" style="left: 24%; top: 50%;"></div>
-              <div class="city-label" style="left: 14%; top: 48%;">云南</div>
+              <img src="map.png" alt="华南运输覆盖网络" style="width: 100%; height: 100%; object-fit: contain; border-radius: 20px; display: block;">
             </div>
           </div>
           <div class="flex gap-3 mt-4 animate-in d2">
@@ -728,20 +703,20 @@
               <p class="text-sm text-neutral-500 mb-3">合作价值与关键指标</p>
               <div class="grid grid-cols-4 gap-4">
                 <div class="text-center py-3 rounded-xl" style="background: var(--bg-soft);">
-                  <p class="text-xs text-neutral-500 mb-1">系统对接完成率</p>
-                  <p class="text-2xl font-bold text-[#C4A35A]">100%</p>
-                </div>
-                <div class="text-center py-3 rounded-xl" style="background: var(--bg-soft);">
                   <p class="text-xs text-neutral-500 mb-1">月均服务车次</p>
-                  <p class="text-2xl font-bold text-[#C4A35A]">833+</p>
+                  <p class="text-2xl font-bold text-[#C4A35A]">1200+</p>
                 </div>
                 <div class="text-center py-3 rounded-xl" style="background: var(--bg-soft);">
                   <p class="text-xs text-neutral-500 mb-1">准时率</p>
-                  <p class="text-2xl font-bold text-[#C4A35A]">[待补充]</p>
+                  <p class="text-2xl font-bold text-[#C4A35A]">96%+</p>
                 </div>
                 <div class="text-center py-3 rounded-xl" style="background: var(--bg-soft);">
                   <p class="text-xs text-neutral-500 mb-1">异常率</p>
-                  <p class="text-2xl font-bold text-[#C4A35A]">[待补充]</p>
+                  <p class="text-2xl font-bold text-[#C4A35A]">2–3%</p>
+                </div>
+                <div class="text-center py-3 rounded-xl" style="background: var(--bg-soft);">
+                  <p class="text-xs text-neutral-500 mb-1">系统对接完成率</p>
+                  <p class="text-2xl font-bold text-[#C4A35A]">100%</p>
                 </div>
               </div>
             </div>
@@ -756,7 +731,7 @@
         <div class="slide-inner relative z-10">
           <div class="mb-4 animate-in">
             <p class="label">广东机场运输方案</p>
-            <h2 class="title max-w-3xl">连接广东主要机场，提供航空货物陆侧运输支持</h2>
+            <h2 class="title">连接广东主要机场，提供航空货物陆侧运输支持</h2>
           </div>
           <div class="flex-1 flex flex-col justify-center">
             <div class="row mb-4 animate-in d1">
@@ -795,19 +770,19 @@
               <div class="cols-4">
                 <div class="card-muted">
                   <p class="text-sm font-semibold text-neutral-700 mb-2">集货与分拨</p>
-                  <p class="text-sm text-neutral-500">[待补充：集货仓、覆盖城市、截单时间]</p>
+                  <p class="text-sm text-neutral-500">深圳/广州/东莞多点集货，覆盖珠三角，按航班截单统筹配载。</p>
                 </div>
                 <div class="card-muted">
                   <p class="text-sm font-semibold text-neutral-700 mb-2">班次与车型</p>
-                  <p class="text-sm text-neutral-500">[待补充：班次、主力车型]</p>
+                  <p class="text-sm text-neutral-500">3T–12T 厢式货车灵活匹配，高频班次定时发运。</p>
                 </div>
                 <div class="card-muted">
                   <p class="text-sm font-semibold text-neutral-700 mb-2">时效承诺</p>
-                  <p class="text-sm text-neutral-500">[待补充：珠三角、偏远区域时效]</p>
+                  <p class="text-sm text-neutral-500">珠三角核心区域当日/次日达；偏远区域提前规划路由。</p>
                 </div>
                 <div class="card-muted">
                   <p class="text-sm font-semibold text-neutral-700 mb-2">主要货类</p>
-                  <p class="text-sm text-neutral-500">[待补充：电商、电子、医药等]</p>
+                  <p class="text-sm text-neutral-500">电子、电商、医疗器械、机械、服装等高时效货物。</p>
                 </div>
               </div>
             </div>
@@ -829,7 +804,9 @@
               <span class="tag tag-solid">BJS 北京首都/大兴</span>
               <span class="tag tag-solid">CGO 郑州新郑</span>
               <span class="tag tag-solid">CKG 重庆江北</span>
-              <span class="tag">[待补充：其它机场]</span>
+              <span class="tag">HGH 杭州萧山</span>
+              <span class="tag">NKG 南京禄口</span>
+              <span class="tag">CTU 成都双流/天府</span>
             </div>
           </div>
           <div class="flex-1 row animate-in d1" style="gap: 20px; min-height: 0;">
@@ -869,19 +846,19 @@
             <div class="cols-4">
               <div class="card-muted" style="padding: 10px 12px;">
                 <p class="text-xs font-semibold text-neutral-700 mb-1">整车 FTL</p>
-                <p class="text-xs text-neutral-500">[待补充：直达线路、车型、时效、适用场景]</p>
+                <p class="text-xs text-neutral-500">广东至 SHA/BJS/CGO/CKG 等机场专车直达，5T–12T 车型匹配，适合大批量高时效货物。</p>
               </div>
               <div class="card-muted" style="padding: 10px 12px;">
                 <p class="text-xs font-semibold text-neutral-700 mb-1">零担 LTL</p>
-                <p class="text-xs text-neutral-500">[待补充：集货仓、拼货逻辑、班次、时效]</p>
+                <p class="text-xs text-neutral-500">华南集货仓统一收货、分拣、拼货，按航班截单发运，降低小批量整车成本。</p>
               </div>
               <div class="card-muted" style="padding: 10px 12px;">
                 <p class="text-xs font-semibold text-neutral-700 mb-1">运作模式</p>
-                <p class="text-xs text-neutral-500">[待补充：自营/合作/往返对开]</p>
+                <p class="text-xs text-neutral-500">以 130+ 台长期合作车辆资源为核心，辅以临时运力补充，形成稳定 + 弹性的运输网络。</p>
               </div>
               <div class="card-muted" style="padding: 10px 12px;">
                 <p class="text-xs font-semibold text-neutral-700 mb-1">增值服务</p>
-                <p class="text-xs text-neutral-500">[待补充：机场交仓、回单、异常处理]</p>
+                <p class="text-xs text-neutral-500">机场交仓预约、电子回单、异常 30 分钟响应、GPS 与温度数据共享。</p>
               </div>
             </div>
           </div>
@@ -911,7 +888,6 @@
                 </div>
               </div>
               <div class="card" style="padding: 16px;">
-                <p class="text-sm text-neutral-500 mb-2">DHL 业务运营（2023.1–6）</p>
                 <div class="cols-2" style="gap: 12px;">
                   <div class="metric card" style="padding: 18px 8px;">
                     <p class="num" style="font-size: 40px;">28</p>
@@ -923,7 +899,7 @@
                   </div>
                 </div>
               </div>
-              <p class="text-center text-xs text-neutral-500">数据来源：嘉亨运输运营统计 / 深圳会议材料</p>
+
             </div>
             <div class="card flex-1" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:0; padding: 16px;">
               <p class="text-sm text-neutral-500 mb-2 self-start">周运输车次趋势</p>
@@ -1027,7 +1003,7 @@
               <div class="flex flex-wrap gap-2">
                 <span class="tag">散货入仓</span>
                 <span class="tag">整柜运输</span>
-                <span class="tag">[待补充：货类]</span>
+                <span class="tag">电子产品 / 百货</span>
               </div>
             </div>
             <div class="card">
@@ -1035,10 +1011,11 @@
                 <h3 class="text-2xl font-semibold">CMS</h3>
                 <span class="tag tag-solid">冷链客户</span>
               </div>
-              <p class="text-sm text-neutral-500 mb-3">[待补充：是否为医药/疫苗、温控范围、线路]</p>
+              <p class="text-sm text-neutral-500 mb-3">医药/疫苗冷链客户，覆盖广东，支持 2–8℃ 冷藏运输，具备 GSP/GDP 能力。</p>
               <div class="flex flex-wrap gap-2">
                 <span class="tag">冷藏运输</span>
-                <span class="tag">[待补充：GSP/GDP]</span>
+                <span class="tag">医药 / 疫苗</span>
+                <span class="tag">GSP / GDP</span>
               </div>
             </div>
             <div class="card">
@@ -1046,10 +1023,11 @@
                 <h3 class="text-2xl font-semibold">SEC</h3>
                 <span class="tag tag-solid">制造客户</span>
               </div>
-              <p class="text-sm text-neutral-500 mb-3">[待补充：具体行业与货类，如电子 / 机械]</p>
+              <p class="text-sm text-neutral-500 mb-3">制造行业客户，以电子/机械普通货物为主，提供散货入仓及码头整柜。</p>
               <div class="flex flex-wrap gap-2">
                 <span class="tag">散货入仓</span>
                 <span class="tag">码头整柜</span>
+                <span class="tag">电子 / 机械</span>
               </div>
             </div>
             <div class="card">
@@ -1057,10 +1035,11 @@
                 <h3 class="text-2xl font-semibold">香港 YL</h3>
                 <span class="tag tag-solid">供应链客户</span>
               </div>
-              <p class="text-sm text-neutral-500 mb-3">[待补充：服务内容与货类]</p>
+              <p class="text-sm text-neutral-500 mb-3">供应链客户，华南散货入仓、码头整柜及配套陆运，覆盖电商/百货。</p>
               <div class="flex flex-wrap gap-2">
                 <span class="tag">散货入仓</span>
                 <span class="tag">码头整柜</span>
+                <span class="tag">电商 / 百货</span>
               </div>
             </div>
           </div>
@@ -1072,7 +1051,7 @@
               <span class="tag">机械设备</span>
               <span class="tag">服装纺织</span>
               <span class="tag">化工原料</span>
-              <span class="tag">[待补充：其它货类]</span>
+              <span class="tag">百货快消</span>
             </div>
           </div>
         </div>
@@ -1089,7 +1068,7 @@
             <div class="card animate-in d1" style="background: var(--bg-soft);">
               <p class="text-sm text-neutral-500 mb-2">实际案例</p>
               <p class="text-xl font-semibold mb-2">中山 / 江门 / 阳江偏远地区 ↔ 广州机场</p>
-              <p class="text-base text-neutral-500">通过提前设计最优路线、共享合作运力、采用多点拼装与多式联运模式，降低偏远区域返空与转运成本。<span class="text-[#C4A35A] font-medium">[待补充：成本降幅、装载率提升数据]</span></p>
+              <p class="text-base text-neutral-500">通过提前设计最优路线、共享合作运力、采用多点拼装与多式联运模式，降低偏远区域返空与转运成本，提升车辆装载率。</p>
             </div>
             <div class="cols-3 animate-in d2">
               <div class="card">
@@ -1133,26 +1112,28 @@
         <div class="slide-inner relative z-10">
           <div class="mb-8 animate-in">
             <p class="label">冷链运输</p>
-            <h2 class="title max-w-2xl">高标准温控运输，保障特殊货物安全</h2>
+            <h2 class="title">高标准温控运输，保障特殊货物安全</h2>
           </div>
           <div class="flex-1 flex items-center">
             <div class="col animate-in d1" style="flex: 0 0 560px; gap: 16px;">
               <div class="card">
                 <p class="text-base font-semibold mb-3">核心能力</p>
                 <ul class="list">
-                  <li>冷藏车辆：专业温控车厢，支持 2–8℃ 等温控区间</li>
-                  <li>温控管理：全程温度监控与异常预警</li>
-                  <li>药品运输经验：具备 GXP 相关操作能力</li>
-                  <li>全程可视化：GPS + 温度数据实时追踪</li>
+                  <li>多温区支持：冷藏 0℃～+4℃、冷冻 ≤-18℃、恒温 ±2℃</li>
+                  <li>全程温控：装车→运输→卸货温度不间断记录，频率 ≤5 分钟/次</li>
+                  <li>异常响应：超温、断录、非法开门自动预警，驾驶员 10 分钟内响应</li>
+                  <li>药品合规：具备 GSP/GDP 相关操作能力，医药冷链记录保存 ≥7 年</li>
+                  <li>全程可视化：GPS 轨迹 + 温度曲线实时追踪与回单归档</li>
                 </ul>
               </div>
               <div class="card">
                 <p class="text-base font-semibold mb-3">代表客户：CMS</p>
-                <p class="text-base text-neutral-500 mb-2">[待补充：具体服务内容、线路、温控要求、年/月车次]</p>
+                <p class="text-base text-neutral-500 mb-2">为医药/冷链客户提供冷藏运输服务，覆盖广东及周边区域，支持 2–8℃ 等温控区间，满足药品、疫苗、生物制品等高要求货物运输。</p>
                 <div class="flex flex-wrap gap-2">
                   <span class="tag">冷藏运输</span>
-                  <span class="tag">[待补充：医药/疫苗]</span>
-                  <span class="tag">[待补充：GSP/GDP]</span>
+                  <span class="tag">医药 / 疫苗</span>
+                  <span class="tag">GSP / GDP</span>
+                  <span class="tag">温度曲线追溯</span>
                 </div>
               </div>
             </div>
@@ -1191,9 +1172,11 @@
               </div>
             </div>
             <div class="card animate-in d2" style="background: var(--bg-soft);">
-              <p class="text-sm text-neutral-500 mb-2">南区实际操作案例</p>
-              <p class="text-lg font-semibold mb-2">[待补充：客户 / 货物 / 操作难点 / 嘉亨方案]</p>
-              <p class="text-base text-neutral-500">示例框架：客户为 [待补充]，货物为 [待补充]，因 [待补充] 需现场装卸与加固；嘉亨派出 [待补充] 车辆/设备，完成 [待补充]，确保 [待补充]。</p>
+              <p class="text-sm text-neutral-500 mb-2">南区实际操作规范与经验</p>
+              <p class="text-lg font-semibold mb-2">工厂提货 · 仓库卸货 · 装卸安全</p>
+              <p class="text-base text-neutral-500">工厂装货：准时到厂，核对托运单联系人、入仓单号、件数、唛头；检查包装、固定货物、拍照记录封条；清关货物核对数量并索取报关资料。</p>
+              <p class="text-base text-neutral-500 mt-2">仓库卸货：提前核查进闸短信，核对仓库与数量；靠位后等待剪封卸货；完成签收单拍照回传，异常立即反馈公司处理。</p>
+              <p class="text-base text-neutral-500 mt-2">装卸安全：执行“六不、六稳、六防”操作制，重货不压易碎、大件不压小件，夜间作业确保照明与通道畅通。</p>
             </div>
           </div>
         </div>
@@ -1211,32 +1194,34 @@
             <div class="flex flex-wrap gap-3">
               <span class="tag tag-solid">ISO9001 质量管理体系</span>
               <span class="tag tag-solid">TAPA 货运资产保护协会</span>
-              <span class="tag">[待补充：证书编号 / 有效期]</span>
+              <span class="tag">证书号 41623QZ0845R0S · 有效期至 2026.10.29</span>
+              <span class="tag">TAPA CN055479 · 有效期至 2028.05.21</span>
             </div>
           </div>
           <div class="flex-1 cols-3 animate-in d1">
             <div class="card">
               <p class="text-sm font-semibold tracking-widest text-[#C4A35A] mb-5">ENVIRONMENT</p>
               <ul class="list">
-                <li>新能源车辆：3 台已投入，目标 16 台</li>
-                <li>降低碳排放：[待补充：预估或实际减排量]</li>
-                <li>优化运输线路，降低空驶率</li>
+                <li>新能源车辆：12 台已投入运营（散货 7 台、货柜 5 台），占合作车辆资源约 9.2%；目标 3 年内更新 50%+</li>
+                <li>逐步在珠三角短途高频线路扩大新能源车应用</li>
+                <li>优化运输线路，降低空驶率与单位货公里能耗</li>
               </ul>
             </div>
             <div class="card">
               <p class="text-sm font-semibold tracking-widest text-[#C4A35A] mb-5">SOCIAL</p>
               <ul class="list">
-                <li>司机培训：[待补充：培训覆盖率 / 年均培训时长]</li>
-                <li>安全管理：[待补充：事故率 / 安全奖惩机制]</li>
-                <li>员工保障：[待补充：社保 / 福利 / 职业发展]</li>
+                <li>司机培训：每季度开展一次司机安全与操作培训</li>
+                <li>应急演练：每年开展 1–2 次模拟演练与案例复盘</li>
+                <li>安全管理：事故分级奖惩，年度无事故驾驶员奖励 600 元</li>
+                <li>员工保障：依法缴纳社保，安全绩效与评优晋升挂钩</li>
               </ul>
             </div>
             <div class="card">
               <p class="text-sm font-semibold tracking-widest text-[#C4A35A] mb-5">GOVERNANCE</p>
               <ul class="list">
-                <li>ISO9001 质量管理体系</li>
-                <li>TAPA 货运资产保护标准</li>
-                <li>标准化流程与合规运营</li>
+                <li>ISO9001 质量管理体系（证书号 41623QZ0845R0S，有效期至 2026.10.29）</li>
+                <li>TAPA TSR 2023 货运资产保护标准（证书号 CN055479，有效期至 2028.05.21）</li>
+                <li>应急响应机制：1 小时内向主管部门报告，配备 10% 应急运力储备</li>
               </ul>
             </div>
           </div>
@@ -1254,7 +1239,7 @@
             <div class="flex gap-12 mb-12">
               <div>
                 <p class="text-sm opacity-60 mb-1">稳定运力</p>
-                <p class="text-lg font-medium">130+ 自有车辆</p>
+                <p class="text-lg font-medium">130+ 合作车辆资源</p>
               </div>
               <div>
                 <p class="text-sm opacity-60 mb-1">快速响应</p>
@@ -1272,15 +1257,16 @@
             <div class="flex gap-16">
               <div>
                 <p class="text-sm opacity-60 mb-1">联系电话</p>
-                <p class="text-lg font-medium">[待补充]</p>
+                <p class="text-lg font-medium">0755-25280588 / 82631258</p>
+                <p class="text-xs opacity-50">传真 0755-25280577</p>
               </div>
               <div>
                 <p class="text-sm opacity-60 mb-1">电子邮箱</p>
-                <p class="text-lg font-medium">[待补充]</p>
+                <p class="text-lg font-medium">angel@JHL56.com</p>
               </div>
               <div>
                 <p class="text-sm opacity-60 mb-1">公司地址</p>
-                <p class="text-lg font-medium">[待补充]</p>
+                <p class="text-lg font-medium">深圳市盐田区东海道244号<br>鹏广达时代广场写字楼C栋1706A</p>
               </div>
             </div>
           </div>
@@ -1295,51 +1281,38 @@
     const slides = document.querySelectorAll('.slide');
     const currentEl = document.getElementById('current');
     const totalEl = document.getElementById('total');
-    let current = 1;
     const total = slides.length;
 
     totalEl.textContent = total;
 
-    function updateSlides() {
-      slides.forEach(slide => {
-        const idx = parseInt(slide.dataset.index);
-        slide.classList.remove('active', 'fade-out');
-        if (idx === current) {
-          slide.classList.add('active');
-        } else if (idx === current - 1 || (current === 1 && idx === total)) {
-          slide.classList.add('fade-out');
+    function updateCurrentFromScroll() {
+      const viewportCenter = window.innerHeight / 2;
+      let closest = 0;
+      let minDistance = Infinity;
+      slides.forEach((slide, index) => {
+        const rect = slide.getBoundingClientRect();
+        const slideCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(slideCenter - viewportCenter);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closest = index;
         }
       });
-      currentEl.textContent = current;
-      location.hash = '#' + current;
+      currentEl.textContent = closest + 1;
     }
 
-    function next() {
-      current = current >= total ? 1 : current + 1;
-      updateSlides();
-    }
-
-    function prev() {
-      current = current <= 1 ? total : current - 1;
-      updateSlides();
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
-        e.preventDefault();
-        next();
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        e.preventDefault();
-        prev();
-      }
-    });
+    window.addEventListener('scroll', updateCurrentFromScroll, { passive: true });
+    window.addEventListener('resize', updateCurrentFromScroll);
 
     if (location.hash) {
       const hashNum = parseInt(location.hash.replace('#', ''));
-      if (hashNum >= 1 && hashNum <= total) current = hashNum;
+      if (hashNum >= 1 && hashNum <= total) {
+        const target = slides[hashNum - 1];
+        if (target) target.scrollIntoView({ behavior: 'instant', block: 'start' });
+      }
     }
 
-    updateSlides();
+    updateCurrentFromScroll();
   </script>
 </body>
 </html>
